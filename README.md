@@ -13,5 +13,5 @@ The goal is to create a guitar tuner with a custom 3D printed enclosure to gift 
 ## Learning Outcomes
 - Protoboard soldering
 - Audio signal processing
-- Application of FFT
+- Implementation of FFT
 - Basic 3D modeling
