@@ -2,16 +2,23 @@
 #include <math.h>
 #include <msp430.h>
 
+#define GUITAR_STRINGS 6
 #define SAMPLE_SIZE 256  // Number of samples for the FFT
 #define SAMPLE_CHANNEL 0 // Define ADC channel to use (P6.0)
 #define SAMPLE_RATE 1000 // ADC sampling rate at 1000 samples per second
 
 // Define the appropriate frequencies for each string of a tuned guitar
-double noteFrequencies[6] = {82.0, 110.0, 147.0, 196.0, 247.0, 330.0};
+double noteFrequencies[GUITAR_STRINGS] = {82.0,  110.0, 147.0,
+                                          196.0, 247.0, 330.0};
+volatile unsigned char tunedString[GUITAR_STRINGS] = {
+    0, 0, 0, 0, 0, 0}; // Set all strings to out-of-tune
 
 void initLED(void);
+void tunedLED(void);
 void initADC(void);
-void tuneFrequency(double frequency);
+void collectSamples(unsigned int *samples);
+int tuneFrequency(double frequency, double targetFrequency, double nearBound,
+                  double farBound, unsigned int indexFrequency);
 
 int main(void) {
   // Stop the watchdog timer
@@ -21,26 +28,31 @@ int main(void) {
   initLED();
   initADC();
 
+  // Array for audio data samples
+  volatile unsigned int samples[SAMPLE_SIZE];
+  double frequency;
+  // Define constants for in-tune, slightly flat/sharp, and very flat/sharp
+  const int boundTuned = 2.0;    // Slightly flat/sharp
+  const int boundNotTuned = 5.0; // Very flat/sharp
+
   // Infinite loop that samples audio data into an array and performs the FFT
   while (1) {
+    // Collect audio samples
+    collectSamples(samples);
 
-    P2OUT |= 0x04;  // Turn on P2.2
-    P1OUT &= ~0x10; // Turn off P1.4
-    P1OUT |= 0x20;  // Turn on P1.5
-    P2OUT &= ~0x10; // Turn off P2.4
-    P2OUT |= 0x20;  // Turn on P2.5
-    P4OUT &= ~0x08; // Turn off P4.3
+    // Perform FFT
+    fft(samples, SAMPLE_SIZE, &frequency, SAMPLE_RATE);
 
-    _delay_cycles(1000000); // temp delay function
+    // Tune each string based on the calculated frequency
+    unsigned int i;
 
-    P2OUT &= ~0x04; // Turn off P2.2
-    P1OUT |= 0x10;  // Turn on P1.4
-    P1OUT &= ~0x20; // Turn off P1.5
-    P2OUT |= 0x10;  // Turn on P2.4
-    P2OUT &= ~0x20; // Turn off P2.5
-    P4OUT |= 0x08;  // Turn on P4.3
-
-    _delay_cycles(1000000); // temp delay function
+    for (i = 0; i < GUITAR_STRINGS; i++) {
+      int tuned = tuneFrequency(frequency, noteFrequencies[i], boundTuned,
+                                boundNotTuned, i);
+      if (tuned == 1) {
+        tunedLED();
+      }
+    }
   }
 }
 
@@ -54,11 +66,41 @@ void initLED() {
   P8DIR |= 0x06;
 
   // Set LEDs to off
-  // P1OUT &= 0x30;
-  // P2OUT &= 0x7C;
-  // P3OUT &= 0x80;
-  // P4OUT &= 0x08;
-  // P8OUT &= 0x06;
+  P1OUT &= 0x00;
+  P2OUT &= 0x00;
+  P3OUT &= 0x00;
+  P4OUT &= 0x00;
+  P8OUT &= 0x00;
+}
+
+void tunedLED(void) {
+  unsigned int i;
+  for (i = 0; i < GUITAR_STRINGS; i++) {
+    if (tunedString[i] == 1) {
+      switch (i) {
+      case 0:
+        P4OUT |= 0x08;
+        break; // P4.3 = E2
+      case 1:
+        P1OUT |= 0x10;
+        break; // P1.4 = A2
+      case 2:
+        P1OUT |= 0x20;
+        break; // P1.5 = D3
+      case 3:
+        P2OUT |= 0x04;
+        break; // P2.2 = G3
+      case 4:
+        P2OUT |= 0x10;
+        break; // P2.4 = B3
+      case 5:
+        P2OUT |= 0x20;
+        break; // P2.5 = E4
+      default:
+        break;
+      }
+    }
+  }
 }
 
 void initADC(void) {
@@ -80,37 +122,44 @@ void initADC(void) {
   ADC12CTL0 |= ADC12ENC | ADC12SC; // Turn on ADC12
 }
 
-void tuneFrequency(double frequency) {
+void collectSamples(unsigned int *samples) {
   unsigned int i;
-  double nearBound = 2.0; // Frequency accuracy for slightly flat/sharp
-  double farBound = 5.0;  // Frequency accuracy for very flat/sharp
 
-  // Reset the "tuning" LEDs,
-  P2OUT &= 0x04; // Turn off P2.3, "very sharp"
-  P2OUT &= 0x40; // Turn off P2.6, "slightly sharp"
-  P3OUT &= 0x80; // Turn off P3.7, "in-tune"
-  P8OUT &= 0x02; // Turn off P8.1, "slightly flat"
-  P8OUT &= 0x04; // Turn off P8.2, "very flat"
-
-  // Determine how flat or sharp each frequency is by iterating through
-  for (i = 0; i < 6; i++) {
-    if (frequency >= (noteFrequencies[i] - farBound) &&
-        frequency <= (noteFrequencies[i] + farBound)) {
-      // Very flat
-      if (frequency < (noteFrequencies[i] - farBound)) {
-        P8OUT |= 0x04; // Turn on the "very flat" LED
-      } else if (frequency >= (noteFrequencies[i] - farBound) &&
-                 frequency < (noteFrequencies[i] - nearBound)) {
-        P8OUT |= 0x02; // Turn on the "slightly flat" LED
-      } else if (frequency >= (noteFrequencies[i] - nearBound) &&
-                 frequency <= (noteFrequencies[i] + nearBound)) {
-        P3OUT |= 0x80; // Turn on the "in-tune" LED
-      } else if (frequency > (noteFrequencies[i] + nearBound) &&
-                 frequency <= (noteFrequencies[i] + farBound)) {
-        P2OUT |= 0x40; // Turn on the "slightly sharp" LED
-      } else if (frequency > (noteFrequencies[i] + farBound)) {
-        P2OUT |= 0x04; // Turn on the "very sharp" LED
-      }
-    }
+  for (i = 0; i < SAMPLE_SIZE; i++) {
+    while (!(ADC12IFG & 0x01))
+      ;                     // Wait for conversion to complete
+    samples[i] = ADC12MEM0; // Store ADC value
+    ADC12CTL0 |= ADC12SC;   // Trigger next conversion
   }
 }
+
+int tuneFrequency(double frequency, double targetFrequency, double nearBound,
+                  double farBound, unsigned int indexFrequency) {
+  if (frequency >= (targetFrequency - farBound) &&
+      frequency <= (targetFrequency + farBound)) {
+    // In-tune
+    if (frequency >= (targetFrequency - nearBound) &&
+        frequency <= (targetFrequency + nearBound)) {
+      // Mark the string as tuned
+      tunedString[indexFrequency] = 1;
+      P3OUT |= 0x80; // Turn on the "in-tune" LED
+      return 1;      // Return 1 to indicate that the string is tuned
+    }
+    // Very flat or sharp
+    else if (frequency < (targetFrequency - farBound)) {
+      P8OUT |= 0x04; // Very flat
+    } else if (frequency > (targetFrequency + farBound)) {
+      P2OUT |= 0x04; // Very sharp
+    }
+    // Slightly flat or sharp
+    else if (frequency >= (targetFrequency - nearBound) &&
+             frequency < targetFrequency) {
+      P8OUT |= 0x02; // Slightly flat
+    } else if (frequency > targetFrequency &&
+               frequency <= (targetFrequency + nearBound)) {
+      P2OUT |= 0x40; // Slightly sharp
+    }
+  }
+  return 0; // Return 0 if the string is not tuned
+}
+

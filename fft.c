@@ -4,21 +4,49 @@
 
 #define pi 3.14159265358979323846
 
+// Bit reversal function
+unsigned int bitReversed(unsigned int num, unsigned int numBits) {
+  unsigned int reversed = 0;
+  for (unsigned int i = 0; i < numBits; i++) {
+    reversed = (reversed << 1) | (num & 1);
+    num >>= 1;
+  }
+  return reversed;
+}
+
 // FFT function
 void fft(volatile unsigned int *samples, unsigned int indexSamples,
-         double *frequency) {
+         double *frequency, double samplingRate) {
   unsigned int i, j, k;
   double real, imaginary;
   double realVal[indexSamples], imaginaryVal[indexSamples];
 
-  //
+  // Initialize real and imaginary parts
   for (i = 0; i < indexSamples; i++) {
     realVal[i] = (double)samples[i];
     imaginaryVal[i] = 0.0;
   }
 
-  // FFT algorithm
-  for (i = 0; i < log2(indexSamples); i++) {
+  // Bit-reversal reordering
+  unsigned int numIterations = 0;
+  while (indexSamples >>= 1) {
+    numIterations++;
+  }
+  for (i = 0; i < indexSamples; i++) {
+    unsigned int j = bitReversed(i, numIterations);
+    if (i < j) {
+      // Swap real and imaginary parts
+      double tempReal = realVal[i];
+      double tempImaginary = imaginaryVal[i];
+      realVal[i] = realVal[j];
+      imaginaryVal[i] = imaginaryVal[j];
+      realVal[j] = tempReal;
+      imaginaryVal[j] = tempImaginary;
+    }
+  }
+
+  // FFT computation (Cooley-Tukey)
+  for (i = 0; i < numIterations; i++) {
     unsigned int stepSize = 1 << (i + 1);
     double angle = 2 * pi / stepSize;
 
@@ -37,11 +65,12 @@ void fft(volatile unsigned int *samples, unsigned int indexSamples,
         realVal[j + k] = evenReal + real;
         imaginaryVal[j + k] = evenImaginary + imaginary;
         realVal[j + k + stepSize / 2] = evenReal - real;
-        realVal[j + k + stepSize / 2] = evenImaginary - imaginary;
+        imaginaryVal[j + k + stepSize / 2] = evenImaginary - imaginary;
       }
     }
   }
 
+  // Find the peak frequency
   unsigned int indexPeak = 0;
   double amplitudeMax = 0.0;
   for (i = 0; i < (indexSamples / 2); i++) {
@@ -53,5 +82,5 @@ void fft(volatile unsigned int *samples, unsigned int indexSamples,
     }
   }
 
-  *frequency = (indexPeak * 44100.0) / indexSamples;
+  *frequency = (indexPeak * samplingRate) / indexSamples;
 }
