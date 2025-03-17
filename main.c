@@ -11,7 +11,7 @@ double noteFrequencies[6] = {82.0, 110.0, 147.0, 196.0, 247.0, 330.0};
 
 void initLED(void);
 void initADC(void);
-void displayFrequency(double frequency);
+void tuneFrequency(double frequency);
 
 int main(void) {
   // Stop the watchdog timer
@@ -21,7 +21,7 @@ int main(void) {
   initLED();
   initADC();
 
-  // Infinite loop
+  // Infinite loop that samples audio data into an array and performs the FFT
   while (1) {
 
     P2OUT |= 0x04;  // Turn on P2.2
@@ -80,7 +80,7 @@ void initADC(void) {
   ADC12CTL0 |= ADC12ENC | ADC12SC; // Turn on ADC12
 }
 
-void displayFrequency(double frequency) {
+void tuneFrequency(double frequency) {
   unsigned int i;
   double nearBound = 2.0; // Frequency accuracy for slightly flat/sharp
   double farBound = 5.0;  // Frequency accuracy for very flat/sharp
