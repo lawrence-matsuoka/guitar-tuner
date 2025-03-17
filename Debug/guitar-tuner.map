@@ -1,7 +1,7 @@
 ******************************************************************************
                   MSP430 Linker Unix v21.6.1                   
 ******************************************************************************
->> Linked Thu Feb 27 13:16:17 2025
+>> Linked Mon Mar 17 09:52:59 2025
 
 OUTPUT FILE NAME:   <guitar-tuner.out>
 ENTRY POINT SYMBOL: "_c_int00_noinit_noargs"  address: 00004400
@@ -19,7 +19,7 @@ MEMORY CONFIGURATION
   INFOB                 00001900   00000080  00000000  00000080  RWIX
   INFOA                 00001980   00000080  00000000  00000080  RWIX
   USBRAM                00001c00   00000800  00000000  00000800  RWIX
-  RAM                   00002400   00002000  000000a0  00001f60  RWIX
+  RAM                   00002400   00002000  00000140  00001ec0  RWIX
   FLASH                 00004400   0000bb80  0000001c  0000bb64  RWIX
   INT00                 0000ff80   00000002  00000000  00000002  RWIX
   INT01                 0000ff82   00000002  00000000  00000002  RWIX
@@ -85,7 +85,7 @@ MEMORY CONFIGURATION
   INT61                 0000fffa   00000002  00000002  00000000  RWIX
   INT62                 0000fffc   00000002  00000002  00000000  RWIX
   RESET                 0000fffe   00000002  00000002  00000000  RWIX
-  FLASH2                00010000   000143f8  000000a2  00014356  RWIX
+  FLASH2                00010000   000143f8  000000cc  0001432c  RWIX
 
 
 SECTION ALLOCATION MAP
@@ -93,6 +93,10 @@ SECTION ALLOCATION MAP
  output                                  attributes/
 section   page    origin      length       input sections
 --------  ----  ----------  ----------   ----------------
+.sysmem    0    00002400    000000a0     UNINITIALIZED
+                  00002400    00000008     rts430x_lc_rd_eabi.lib : memory.c.obj (.sysmem)
+                  00002408    00000098     --HOLE--
+
 .stack     0    00004360    000000a0     UNINITIALIZED
                   00004360    00000004     rts430x_lc_rd_eabi.lib : boot.c.obj (.stack)
                   00004364    0000009c     --HOLE--
@@ -186,21 +190,22 @@ SYSNMI     0    0000fffc    00000002
 .reset     0    0000fffe    00000002     
                   0000fffe    00000002     rts430x_lc_rd_eabi.lib : boot.c.obj (.reset)
 
-.text      0    00010000    000000a2     
-                  00010000    00000072     main.obj (.text:main)
-                  00010072    00000016     main.obj (.text:configureADC)
-                  00010088    00000010     main.obj (.text:readADC)
-                  00010098    00000006     rts430x_lc_rd_eabi.lib : exit.c.obj (.text:abort)
-                  0001009e    00000004                            : pre_init.c.obj (.text:_system_pre_init)
+.text      0    00010000    000000cc     
+                  00010000    0000007e     main.obj (.text:main)
+                  0001007e    0000001e     main.obj (.text:initLED)
+                  0001009c    00000016     main.obj (.text:configureADC)
+                  000100b2    00000010     main.obj (.text:readADC)
+                  000100c2    00000006     rts430x_lc_rd_eabi.lib : exit.c.obj (.text:abort)
+                  000100c8    00000004                            : pre_init.c.obj (.text:_system_pre_init)
 
 MODULE SUMMARY
 
        Module             code   ro data   rw data
        ------             ----   -------   -------
     ./
-       main.obj           152    0         0      
+       main.obj           194    0         0      
     +--+------------------+------+---------+---------+
-       Total:             152    0         0      
+       Total:             194    0         0      
                                                   
     /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/lib/rts430x_lc_rd_eabi.lib
        boot.c.obj         20     2         0      
@@ -232,9 +237,10 @@ MODULE SUMMARY
     +--+------------------+------+---------+---------+
        Total:             38     46        0      
                                                   
+       Heap:              0      0         160    
        Stack:             0      0         160    
     +--+------------------+------+---------+---------+
-       Grand Total:       190    46        160    
+       Grand Total:       232    46        320    
 
 
 GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
@@ -323,7 +329,7 @@ address   name
 00000732  ADC12MEM9             
 00000733  ADC12MEM9_H           
 00000732  ADC12MEM9_L           
-00010098  C$$EXIT               
+000100c2  C$$EXIT               
 000008c0  CBCTL0                
 000008c1  CBCTL0_H              
 000008c0  CBCTL0_L              
@@ -974,6 +980,7 @@ address   name
 0000015c  WDTCTL_L              
 00004400  __STACK_END           
 000000a0  __STACK_SIZE          
+000000a0  __SYSMEM_SIZE         
 00004400  __TI_CINIT_Base       
 00004400  __TI_CINIT_Limit      
 00004400  __TI_CINIT_Warm       
@@ -1007,11 +1014,13 @@ ffffffff  __c_args__
 00004400  _c_int00_noinit_noargs
 0000fffe  _reset_vector         
 00004360  _stack                
-0001009e  _system_pre_init      
-00010098  abort                 
-00010072  configureADC          
+00002400  _sys_memory           
+000100c8  _system_pre_init      
+000100c2  abort                 
+0001009c  configureADC          
+0001007e  initLED               
 00010000  main                  
-00010088  readADC               
+000100b2  readADC               
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -1019,6 +1028,7 @@ GLOBAL SYMBOLS: SORTED BY Symbol Address
 address   name                  
 -------   ----                  
 000000a0  __STACK_SIZE          
+000000a0  __SYSMEM_SIZE         
 00000100  SFRIE1                
 00000100  SFRIE1_L              
 00000101  SFRIE1_H              
@@ -1749,6 +1759,7 @@ address   name
 000023fd  USBIEPBBAY_7          
 000023fe  USBIEPBCTY_7          
 000023ff  USBIEPSIZXY_7         
+00002400  _sys_memory           
 00004360  _stack                
 00004400  __STACK_END           
 00004400  __TI_CINIT_Base       
@@ -1780,14 +1791,15 @@ address   name
 0000fffc  __TI_int62            
 0000fffe  _reset_vector         
 00010000  main                  
-00010072  configureADC          
-00010088  readADC               
-00010098  C$$EXIT               
-00010098  abort                 
-0001009e  _system_pre_init      
+0001007e  initLED               
+0001009c  configureADC          
+000100b2  readADC               
+000100c2  C$$EXIT               
+000100c2  abort                 
+000100c8  _system_pre_init      
 ffffffff  __TI_pprof_out_hndl   
 ffffffff  __TI_prof_data_size   
 ffffffff  __TI_prof_data_start  
 ffffffff  __c_args__            
 
-[771 symbols]
+[774 symbols]
