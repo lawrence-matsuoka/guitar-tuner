@@ -1,6 +1,7 @@
 #include "fft.h" // import the Fast Fourier Transform library
 #include <math.h>
 #include <msp430.h>
+#include <stdio.h>
 
 #define GUITAR_STRINGS 6
 #define SAMPLE_SIZE 256  // Number of samples for the FFT
@@ -21,6 +22,9 @@ int tuneFrequency(double frequency, double targetFrequency, double nearBound,
                   double farBound, unsigned int indexFrequency);
 
 int main(void) {
+  // FOR TESTING PURPOSES
+  printf("Hello main function!\n");
+
   // Stop the watchdog timer
   WDTCTL = WDTPW | WDTHOLD;
 
@@ -29,7 +33,7 @@ int main(void) {
   initADC();
 
   // Array for audio data samples
-  volatile unsigned int samples[SAMPLE_SIZE];
+  unsigned int samples[SAMPLE_SIZE];
   double frequency;
   // Define constants for in-tune, slightly flat/sharp, and very flat/sharp
   const int boundTuned = 2.0;    // Slightly flat/sharp
@@ -71,9 +75,16 @@ void initLED() {
   P3OUT &= 0x00;
   P4OUT &= 0x00;
   P8OUT &= 0x00;
+
+  // FOR TESTING PURPOSES
+  printf("Hello initLED function!\n");
 }
 
 void tunedLED(void) {
+
+  // FOR TESTING PURPOSES
+  printf("Hello tunedLED function!\n");
+
   unsigned int i;
   for (i = 0; i < GUITAR_STRINGS; i++) {
     if (tunedString[i] == 1) {
@@ -104,6 +115,10 @@ void tunedLED(void) {
 }
 
 void initADC(void) {
+
+  // FOR TESTING PURPOSES
+  printf("Hello initADC function!\n");
+
   // Disable the ADC to avoid conflicts during configuration
   ADC12CTL0 = ADC12CTL0 & ~ADC12ENC;
 
@@ -123,6 +138,10 @@ void initADC(void) {
 }
 
 void collectSamples(unsigned int *samples) {
+
+  // FOR TESTING PURPOSES
+  printf("Hello collectSamples function!\n");
+
   unsigned int i;
 
   for (i = 0; i < SAMPLE_SIZE; i++) {
@@ -135,6 +154,10 @@ void collectSamples(unsigned int *samples) {
 
 int tuneFrequency(double frequency, double targetFrequency, double nearBound,
                   double farBound, unsigned int indexFrequency) {
+
+  // FOR TESTING PURPOSES
+  printf("Hello tuneFrequency function!\n");
+
   if (frequency >= (targetFrequency - farBound) &&
       frequency <= (targetFrequency + farBound)) {
     // In-tune

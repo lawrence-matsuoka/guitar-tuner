@@ -1,13 +1,18 @@
 #include "fft.h"
 #include <math.h>
-// #include <complex.h>
+#include <stdio.h>
 
 #define pi 3.14159265358979323846
 
 // Bit reversal function
 unsigned int bitReversed(unsigned int num, unsigned int numBits) {
+
+  // FOR TESTING PURPOSES
+  printf("Hello bitReversed function!\n");
+
   unsigned int reversed = 0;
-  for (unsigned int i = 0; i < numBits; i++) {
+  unsigned int i;
+  for (i = 0; i < numBits; i++) {
     reversed = (reversed << 1) | (num & 1);
     num >>= 1;
   }
@@ -20,6 +25,9 @@ void fft(volatile unsigned int *samples, unsigned int indexSamples,
   unsigned int i, j, k;
   double real, imaginary;
   double realVal[indexSamples], imaginaryVal[indexSamples];
+
+  // FOR TESTING PURPOSES
+  printf("Hello fft function!\n");
 
   // Initialize real and imaginary parts
   for (i = 0; i < indexSamples; i++) {
