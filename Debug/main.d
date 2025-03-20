@@ -16,8 +16,6 @@ main.obj: /home/lawrence/ti/ccs1281/ccs/ccs_base/msp430/include/msp430f5529.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/ccs_base/msp430/include/in430.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/intrinsics.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/intrinsics_legacy_undefs.h
-main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/stdio.h
-main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/stdarg.h
 
 ../main.c:
 
@@ -50,8 +48,4 @@ main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/
 /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/intrinsics.h:
 
 /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/intrinsics_legacy_undefs.h:
-
-/home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/stdio.h:
-
-/home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/stdarg.h:
 

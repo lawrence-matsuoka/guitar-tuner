@@ -1,4 +1,5 @@
 #include <msp430.h>
+#include <stdio.h>
 
 void uart_init(void) {
   P3SEL |= 0x18;                 // P3.3, P3.4 = USCI_A0 TXD/RXD

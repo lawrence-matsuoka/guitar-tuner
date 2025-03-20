@@ -1,6 +1,6 @@
 #include "fft.h"
+#include "uart.h"
 #include <math.h>
-#include <stdio.h>
 
 #define pi 3.14159265358979323846
 
@@ -8,7 +8,7 @@
 unsigned int bitReversed(unsigned int num, unsigned int numBits) {
 
   // FOR TESTING PURPOSES
-  printf("Hello bitReversed function!\n");
+  uart_send_string("bitReversed\n");
 
   unsigned int reversed = 0;
   unsigned int i;
@@ -27,7 +27,7 @@ void fft(volatile unsigned int *samples, unsigned int indexSamples,
   double realVal[indexSamples], imaginaryVal[indexSamples];
 
   // FOR TESTING PURPOSES
-  printf("Hello fft function!\n");
+  uart_send_string(" fft\n");
 
   // Initialize real and imaginary parts
   for (i = 0; i < indexSamples; i++) {

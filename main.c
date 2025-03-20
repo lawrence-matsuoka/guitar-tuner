@@ -2,12 +2,11 @@
 #include "uart.h" // import the UART library
 #include <math.h>
 #include <msp430.h>
-#include <stdio.h>
 
 #define GUITAR_STRINGS 6
-#define SAMPLE_SIZE 256  // Number of samples for the FFT
+#define SAMPLE_SIZE 2  //256 Number of samples for the FFT
 #define SAMPLE_CHANNEL 0 // Define ADC channel to use (P6.0)
-#define SAMPLE_RATE 1000 // ADC sampling rate at 1000 samples per second
+#define SAMPLE_RATE 500 //1000 ADC sampling rate at 1000 samples per second
 
 // Define the appropriate frequencies for each string of a tuned guitar
 double noteFrequencies[GUITAR_STRINGS] = {82.0,  110.0, 147.0,
@@ -39,9 +38,9 @@ int main(void) {
   // Array for audio data samples
   unsigned int samples[SAMPLE_SIZE];
   double frequency;
-  // Define constants for in-tune, slightly flat/sharp, and very flat/sharp
-  const int boundTuned = 2.0;    // Slightly flat/sharp
-  const int boundNotTuned = 5.0; // Very flat/sharp
+  // Define variables for in-tune, slightly flat/sharp, and very flat/sharp
+  double boundTuned = 2.0;    // Slightly flat/sharp
+  double boundNotTuned = 5.0; // Very flat/sharp
 
   // Infinite loop that samples audio data into an array and performs the FFT
   while (1) {
@@ -49,21 +48,26 @@ int main(void) {
     uart_send_string("Loop\n");
 
     // Collect audio samples
-    collectSamples(samples);
+    //collectSamples(samples);
 
     // Perform FFT
+    //fft(samples, SAMPLE_SIZE, &frequency, SAMPLE_RATE);
+    unsigned int samples[2] = {3000, 3500};
     fft(samples, SAMPLE_SIZE, &frequency, SAMPLE_RATE);
 
-    // Tune each string based on the calculated frequency
-    unsigned int i;
+    // FOR TESTING PURPOSES
+    uart_send_int(frequency);
 
-    for (i = 0; i < GUITAR_STRINGS; i++) {
-      int tuned = tuneFrequency(frequency, noteFrequencies[i], boundTuned,
-                                boundNotTuned, i);
-      if (tuned == 1) {
-        tunedLED();
-      }
-    }
+    // Tune each string based on the calculated frequency
+    //unsigned int i;
+
+    //for (i = 0; i < GUITAR_STRINGS; i++) {
+    //  int tuned = tuneFrequency(frequency, noteFrequencies[i], boundTuned,
+    //                            boundNotTuned, i);
+    //  if (tuned == 1) {
+    //    tunedLED();
+    //  }
+    //}
   }
 }
 
@@ -147,7 +151,7 @@ void initADC(void) {
 void collectSamples(unsigned int *samples) {
 
   // FOR TESTING PURPOSES
-    uart_send_string("collectSamples\n");
+  uart_send_string("collectSamples\n");
 
   unsigned int i;
 
@@ -156,6 +160,10 @@ void collectSamples(unsigned int *samples) {
       ;                     // Wait for conversion to complete
     samples[i] = ADC12MEM0; // Store ADC value
     ADC12CTL0 |= ADC12SC;   // Trigger next conversion
+
+    // FOR TESTING PURPOSES
+    //int testInt = samples[i];
+    //uart_send_int(testInt);
   }
 }
 
