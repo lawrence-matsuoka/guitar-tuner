@@ -10,6 +10,7 @@ GEN_CMDS__FLAG :=
 ORDERED_OBJS += \
 "./fft.obj" \
 "./main.obj" \
+"./uart.obj" \
 "../lnk_msp430f5529.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibmath.a \
@@ -141,8 +142,8 @@ guitar-tuner.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "fft.obj" "main.obj" 
-	-$(RM) "fft.d" "main.d" 
+	-$(RM) "fft.obj" "main.obj" "uart.obj" 
+	-$(RM) "fft.d" "main.d" "uart.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

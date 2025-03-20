@@ -8,26 +8,32 @@ CMD_SRCS += \
 
 C_SRCS += \
 ../fft.c \
-../main.c 
+../main.c \
+../uart.c 
 
 C_DEPS += \
 ./fft.d \
-./main.d 
+./main.d \
+./uart.d 
 
 OBJS += \
 ./fft.obj \
-./main.obj 
+./main.obj \
+./uart.obj 
 
 OBJS__QUOTED += \
 "fft.obj" \
-"main.obj" 
+"main.obj" \
+"uart.obj" 
 
 C_DEPS__QUOTED += \
 "fft.d" \
-"main.d" 
+"main.d" \
+"uart.d" 
 
 C_SRCS__QUOTED += \
 "../fft.c" \
-"../main.c" 
+"../main.c" \
+"../uart.c" 
 
 

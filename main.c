@@ -1,4 +1,5 @@
 #include "fft.h" // import the Fast Fourier Transform library
+#include "uart.h" // import the UART library
 #include <math.h>
 #include <msp430.h>
 #include <stdio.h>
@@ -23,7 +24,7 @@ int tuneFrequency(double frequency, double targetFrequency, double nearBound,
 
 int main(void) {
   // FOR TESTING PURPOSES
-  printf("Hello main function!\n");
+  uart_send_string("main\n");
 
   // Stop the watchdog timer
   WDTCTL = WDTPW | WDTHOLD;
@@ -31,6 +32,9 @@ int main(void) {
   // Initialize the LEDs and ADC
   initLED();
   initADC();
+
+  // Initialize UART
+  uart_init();
 
   // Array for audio data samples
   unsigned int samples[SAMPLE_SIZE];
@@ -41,6 +45,9 @@ int main(void) {
 
   // Infinite loop that samples audio data into an array and performs the FFT
   while (1) {
+    // FOR TESTING PURPOSES
+    uart_send_string("Loop\n");
+
     // Collect audio samples
     collectSamples(samples);
 
@@ -77,13 +84,13 @@ void initLED() {
   P8OUT &= 0x00;
 
   // FOR TESTING PURPOSES
-  printf("Hello initLED function!\n");
+  uart_send_string("initLED\n");
 }
 
 void tunedLED(void) {
 
   // FOR TESTING PURPOSES
-  printf("Hello tunedLED function!\n");
+    uart_send_string("tunedLED\n");
 
   unsigned int i;
   for (i = 0; i < GUITAR_STRINGS; i++) {
@@ -117,7 +124,7 @@ void tunedLED(void) {
 void initADC(void) {
 
   // FOR TESTING PURPOSES
-  printf("Hello initADC function!\n");
+    uart_send_string("initADC\n");
 
   // Disable the ADC to avoid conflicts during configuration
   ADC12CTL0 = ADC12CTL0 & ~ADC12ENC;
@@ -140,7 +147,7 @@ void initADC(void) {
 void collectSamples(unsigned int *samples) {
 
   // FOR TESTING PURPOSES
-  printf("Hello collectSamples function!\n");
+    uart_send_string("collectSamples\n");
 
   unsigned int i;
 
@@ -156,7 +163,7 @@ int tuneFrequency(double frequency, double targetFrequency, double nearBound,
                   double farBound, unsigned int indexFrequency) {
 
   // FOR TESTING PURPOSES
-  printf("Hello tuneFrequency function!\n");
+    uart_send_string("tuneFrequency\n");
 
   if (frequency >= (targetFrequency - farBound) &&
       frequency <= (targetFrequency + farBound)) {
