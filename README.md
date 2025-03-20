@@ -23,7 +23,7 @@ The goal is to create a guitar tuner with a custom 3D printed enclosure to gift 
 - Soldering equipment
 
 ### MSP430F5529 Launchpad
-![MSP430F5529LP pin map](docs/MSP430F5529-Launchpad-Pin-Map.png)
+![MSP430F5529LP pin map](docs/MSP430F5529LP-Launchpad-Pin-Map.png)
 
 ## Breakdown
 - The MAX4466 microphone module inputs an analog signal into the MSP430
