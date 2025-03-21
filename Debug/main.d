@@ -3,6 +3,7 @@
 main.obj: ../main.c
 main.obj: ../fft.h
 main.obj: ../uart.h
+main.obj: ../adc.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/math.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/_ti_config.h
 main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/linkage.h
@@ -22,6 +23,8 @@ main.obj: /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/
 ../fft.h:
 
 ../uart.h:
+
+../adc.h:
 
 /home/lawrence/ti/ccs1281/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include/math.h:
 

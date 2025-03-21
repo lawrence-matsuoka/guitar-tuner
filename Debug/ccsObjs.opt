@@ -1,3 +1,4 @@
+"./adc.obj"
 "./fft.obj"
 "./main.obj"
 "./uart.obj"

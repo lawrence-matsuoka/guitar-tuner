@@ -8,6 +8,7 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
+"./adc.obj" \
 "./fft.obj" \
 "./main.obj" \
 "./uart.obj" \
@@ -142,8 +143,8 @@ guitar-tuner.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "fft.obj" "main.obj" "uart.obj" 
-	-$(RM) "fft.d" "main.d" "uart.d" 
+	-$(RM) "adc.obj" "fft.obj" "main.obj" "uart.obj" 
+	-$(RM) "adc.d" "fft.d" "main.d" "uart.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

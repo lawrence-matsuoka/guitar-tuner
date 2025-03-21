@@ -1,12 +1,13 @@
 #include "fft.h" // import the Fast Fourier Transform library
 #include "uart.h" // import the UART library
+#include "adc.h" // import the ADC library
 #include <math.h>
 #include <msp430.h>
 
 #define GUITAR_STRINGS 6
-#define SAMPLE_SIZE 2  //256 Number of samples for the FFT
+#define SAMPLE_SIZE 256  //256 Number of samples for the FFT
 #define SAMPLE_CHANNEL 0 // Define ADC channel to use (P6.0)
-#define SAMPLE_RATE 500 //1000 ADC sampling rate at 1000 samples per second
+#define SAMPLE_RATE 1000 //1000 ADC sampling rate at 1000 samples per second
 
 // Define the appropriate frequencies for each string of a tuned guitar
 double noteFrequencies[GUITAR_STRINGS] = {82.0,  110.0, 147.0,
@@ -14,10 +15,8 @@ double noteFrequencies[GUITAR_STRINGS] = {82.0,  110.0, 147.0,
 volatile unsigned char tunedString[GUITAR_STRINGS] = {
     0, 0, 0, 0, 0, 0}; // Set all strings to out-of-tune
 
-void initLED(void);
-void tunedLED(void);
-void initADC(void);
-void collectSamples(unsigned int *samples);
+void led_init(void);
+void led_tuned(void);
 int tuneFrequency(double frequency, double targetFrequency, double nearBound,
                   double farBound, unsigned int indexFrequency);
 
@@ -29,8 +28,8 @@ int main(void) {
   WDTCTL = WDTPW | WDTHOLD;
 
   // Initialize the LEDs and ADC
-  initLED();
-  initADC();
+  led_init();
+  adc_init();
 
   // Initialize UART
   uart_init();
@@ -48,15 +47,13 @@ int main(void) {
     uart_send_string("Loop\n");
 
     // Collect audio samples
-    //collectSamples(samples);
+    adc_sampler(samples, SAMPLE_SIZE);
 
     // Perform FFT
     //fft(samples, SAMPLE_SIZE, &frequency, SAMPLE_RATE);
-    unsigned int samples[2] = {3000, 3500};
-    fft(samples, SAMPLE_SIZE, &frequency, SAMPLE_RATE);
 
     // FOR TESTING PURPOSES
-    uart_send_int(frequency);
+    //uart_send_int(frequency);
 
     // Tune each string based on the calculated frequency
     //unsigned int i;
@@ -65,13 +62,13 @@ int main(void) {
     //  int tuned = tuneFrequency(frequency, noteFrequencies[i], boundTuned,
     //                            boundNotTuned, i);
     //  if (tuned == 1) {
-    //    tunedLED();
+    //    led_tuned();
     //  }
     //}
   }
 }
 
-void initLED() {
+void led_init() {
   // Tuned notes LEDs on P1.4, P1.5, P2.2, P2.4, P2.5, P4.3
   // Sharp and Flat LEDs on P2.3, P2.6, P3.7, P8.1, P8.2
   P1DIR |= 0x30;
@@ -88,13 +85,13 @@ void initLED() {
   P8OUT &= 0x00;
 
   // FOR TESTING PURPOSES
-  uart_send_string("initLED\n");
+  uart_send_string("led_init\n");
 }
 
-void tunedLED(void) {
+void led_tuned(void) {
 
   // FOR TESTING PURPOSES
-    uart_send_string("tunedLED\n");
+    uart_send_string("led_tuned\n");
 
   unsigned int i;
   for (i = 0; i < GUITAR_STRINGS; i++) {
@@ -122,48 +119,6 @@ void tunedLED(void) {
         break;
       }
     }
-  }
-}
-
-void initADC(void) {
-
-  // FOR TESTING PURPOSES
-    uart_send_string("initADC\n");
-
-  // Disable the ADC to avoid conflicts during configuration
-  ADC12CTL0 = ADC12CTL0 & ~ADC12ENC;
-
-  ADC12CTL0 =
-      ADC12SHT0_8 | ADC12ON; // Set sampling time to 512 clocks and turn ADC on
-  ADC12CTL1 =
-      ADC12CSTARTADD_0 |
-      ADC12SHP; // Single channel, single conversion, and SHP for internal clock
-  ADC12CTL2 = ADC12RES_2; // 12-bit resolution
-
-  P6DIR &= ~0x01; // set P6.0 as input
-  P6SEL |= 0x01;  // Set P6.0 as analog input
-
-  //    ADC12IE0 = 0x01;  // Enable P6.0 interrupt
-
-  ADC12CTL0 |= ADC12ENC | ADC12SC; // Turn on ADC12
-}
-
-void collectSamples(unsigned int *samples) {
-
-  // FOR TESTING PURPOSES
-  uart_send_string("collectSamples\n");
-
-  unsigned int i;
-
-  for (i = 0; i < SAMPLE_SIZE; i++) {
-    while (!(ADC12IFG & 0x01))
-      ;                     // Wait for conversion to complete
-    samples[i] = ADC12MEM0; // Store ADC value
-    ADC12CTL0 |= ADC12SC;   // Trigger next conversion
-
-    // FOR TESTING PURPOSES
-    //int testInt = samples[i];
-    //uart_send_int(testInt);
   }
 }
 
